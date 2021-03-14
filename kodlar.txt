@@ -1,0 +1,150 @@
+const Discord = require('discord.js');
+const client = new Discord.Client();
+const işaret = require('./işaret.json');
+const hedefimiz = require('./hedef.json');
+
+var prefix = işaret.prefix
+var hedef = hedefimiz.hedef
+
+client.on('ready', () => {
+  console.log(`Botun ${client.user.tag}Sunucuya Giriş Yaptı!`);
+  client.user.setActivity('SONSUZA KADAR SİZE HİZMET EDİCEM', { type: 'PLAYING' })
+ .then(presence => console.log(`Durum ---> ${presence.activities[0].name} oldu.`))
+ .catch(console.error);
+});
+
+client.on('message', async message => {
+  if (message.content.startsWith('!')) {
+    const args = message.content.split(' ').slice(1)
+    const botmesajı = args.join(" ")
+    if (!botmesajı) return message.reply('URL Koymadınız.')
+    if (message.member.voice.channel) {
+      const connection = await message.member.voice.channel.join();
+      const ytdl = require('ytdl-core');
+      connection.play(ytdl(`${botmesajı}`, { filter: 'audioonly' }))
+    } else {
+message.reply('Bir Sesli Kanala Katıl.');
+    }
+  }
+})
+
+client.on("message", message => {
+  if (message.content.startsWith('rolver')) {
+    if (!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('Bunu yapamazsın')
+    let role = message.mentions.roles.first();
+    let member = message.mentions.members.first();
+    member.roles.add(role)
+  }
+});
+
+client.on('message', message => {
+  if (!message.guild) return;
+  if (message.content.startsWith('!kick')) {
+    if (!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('Bunu yapamazsın')
+    const user = message.mentions.users.first();
+    if (user) {
+      const member = message.guild.member(user);
+      if (member) {
+        member
+          .kick()
+          .then(() => {
+          const log = message.guild.channels.cache.find(channel => channel.name === 'log-kanalı')
+           log.send(`${user.tag} kişisi kicklenmiştir`);
+          })
+          .catch(err => {
+            message.reply('Bunu yapamam.');
+            console.error(err);
+          });
+      } else {
+        message.reply("Bahsettiğin kişi bizim sunucuda bulunmuyor");
+      }
+    } else {
+      message.reply("Atılacak kişiyi yazmadın");
+    }
+  }
+});
+
+client.on('message', message => {
+  if (!message.guild) return;
+if (message.content.startsWith('!ban')) {
+    if (!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('Bunu yapamazsın')
+    const user = message.mentions.users.first();
+    if (user) {
+      const member = message.guild.member(user);
+      if (member) {
+        member
+          .ban()
+          .then(() => {
+          const log = message.guild.channels.cache.find(channel => channel.name === 'log-kanalı')
+           log.send(`${user.tag} kişisi banlanmıştır.`);
+          })
+          .catch(err => {
+            message.reply('Bunu yapamam.');
+            console.error(err);
+          });
+      } else {
+        message.reply("Bahsettiğin kişi bizim sunucuda bulunmuyor");
+      }
+    } else {
+      message.reply("Yasaklanacak kişiyi yazmadın.");
+    }
+  }
+});
+
+client.on('guildMemberAdd', member => {
+const girişçıkış = member.guild.channels.cache.find(channel => channel.name === '「✅」sayaç');
+girişçıkış.send(`${member} Sunucumuza katıldı. Üye Sayımız **${member.guild.memberCount}**, Üye Hedefimiz **${hedef}**`);
+});
+
+client.on('guildMemberRemove', member => {
+const girişçıkış = member.guild.channels.cache.find(channel => channel.name === '「✅」sayaç');
+girişçıkış.send(`${member} Sunucumuzdan Ayrıldı. Üye Sayımız **${member.guild.memberCount}**, Üye Hedefimiz **${hedef}**`);
+});
+
+client.on('guildMemberAdd', member => {
+  const girişçıkış = member.guild.channels.cache.find(channel => channel.name ==="「🚪」gelen-giden");
+  girişçıkış.send(`Aramıza Hoşgeldin, ${member}`);
+  member.send(`${member} Sunucumuza Hoşgeldin İyi Vakitler Geçirmen Dileğiyle`);
+});
+
+client.on('guildMemberRemove', member => {
+  const girişçıkış = member.guild.channels.cache.find(channel => channel.name ==="「🚪」gelen-giden");
+  girişçıkış.send(`${member} Sunucudan Ayrıldı Bizi Çok Üzdü💔`);
+  member.send(`${member} Niye Ayrıldın Beni Çok Üzdün💔`);
+});
+
+client.on('message', msg => {
+  if (msg.content.toLowerCase() === 'sa') {
+    msg.reply('As');
+  }
+  if (msg.content.toLowerCase() === 'merhaba') {
+    msg.reply('Hoşgeldin');
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content.toLowerCase() === prefix + 'discord') {
+    msg.reply('https://discord.gg/qSCd98rUAv');
+}
+if (msg.content.toLowerCase() === prefix + 'discordburak') {
+  msg.reply('https://discord.gg/zvNMdNFHCd');
+}
+if (msg.content.toLowerCase() === prefix + 'tiktokburak') {
+  msg.reply('https://www.tiktok.com/@tq_burak?lang=tr');
+}
+if (msg.content.toLowerCase() === prefix + 'youtubeburak') {
+  msg.reply('https://www.youtube.com/channel/UC5Bp0jU-9qL80Y-ew3qf-UQ');
+}
+if (msg.content.toLowerCase() === prefix + 'komutlar') {
+  msg.reply('sa merhaba !discord !discordburak !tiktokburak !youtubeburak Komutlar Bunlar');
+}
+});
+
+client.on('message', msg => {
+  if (msg.content.toLowerCase() === 'amk') {
+    msg.delete()
+    msg.reply('sanada a*k');
+  }
+});
+
+client.login('Nzc5NzI3MzE2MjcxNjI4MzE4.X7kvpg.kDMRZ7HIuB3mqI1hQw9_XQPvq78');
